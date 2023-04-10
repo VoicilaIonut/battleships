@@ -234,7 +234,7 @@ const StartGame = ({gameStatus}) => {
     ship.placed=true
 
     const shipConfigation = {
-      "x": String.fromCharCode(65 + indexY + 1),
+      "x": String.fromCharCode(65 + indexY),
       "y": indexX + 1,
       "size": ship.length,
       "direction": (ship.vertical ? "VERTICAL" : "HORIZONTAL")
@@ -260,7 +260,24 @@ const StartGame = ({gameStatus}) => {
 
   const handleSendAttack = (e) => {
     e.preventDefault();
-    console.log(placeOnGameTable);
+    console.log(placeOnGameTable, productId, "send attack to api");
+    const indexX = placeOnGameTable[0];
+    const indexY = placeOnGameTable[1];
+    const accessToken = localStorage["accessToken"];
+
+    const configureNewBoard =(result, indexX, indexY) => {
+      console.log(indexX, indexY, result);
+      const copie = board.slice();
+      copie[indexX][indexY] = result['result'] === true ? 'Y': "N";
+      setBoard(copie);
+    }
+
+    fetch(`${url}/strike/${productId}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json",},
+      body: JSON.stringify({'x': String.fromCharCode(65 + indexY), 'y': indexX + 1})
+    }).then((response) => response.json())
+      .then((json) => configureNewBoard(json, indexX, indexY)); // 
   }
   console.log(gameStatus);
   return (
