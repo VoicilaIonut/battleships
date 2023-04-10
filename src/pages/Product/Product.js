@@ -204,7 +204,7 @@ const checkOtherShips = (board, ship, indexX, indexY) => {
   return true;
 }
 
-const StartGame = () => {
+const StartGame = ({gameStatus}) => {
   const [selected, setSelected] = useState(null);
   const [placeOnGameTable, setPlaceOnGameTable] = useState(null);
   const [board, setBoard] = useState(Array(10).fill(0).map(row => new Array(10).fill(0)));
@@ -258,14 +258,27 @@ const StartGame = () => {
       .then((json) => console.log(json)); // 
   }
 
+  const handleSendAttack = (e) => {
+    e.preventDefault();
+    console.log(placeOnGameTable);
+  }
+  console.log(gameStatus);
   return (
     <>
-      <button onClick={handleSendMapToApi}>send to api</button> <br></br>
-      {selected && placeOnGameTable && mutarePermisa(placeOnGameTable) && (<button onClick={handlePlaceShip}>PUNE</button>)}
       <div className='start-game'>
         <Game board={board} setPlaceOnGameTable={setPlaceOnGameTable}/>
-        <ChooseShips ships={ships} setSelected={setSelected}/> <br></br>
-        
+        {gameStatus==="MAP_CONFIG" && (
+          <>
+          <ChooseShips ships={ships} setSelected={setSelected}/><br></br>
+          <button onClick={handleSendMapToApi}>send to api</button> <br></br>
+          {selected && placeOnGameTable && mutarePermisa(placeOnGameTable) && (<button onClick={handlePlaceShip}>PUNE</button>)}
+          </>
+        )}
+        {gameStatus==="ACTIVE" && (
+            <>
+              <button onClick={handleSendAttack}>ATAC</button>
+            </>
+        )}
       </div>
     </>
   )
@@ -289,7 +302,8 @@ const Product = () => {
         <h5>Player 1 {game.player1Id}</h5>
         <h5>Player 2 {game.player2Id}</h5>
         <h5>Play care trebuie sa atace: {game.playerToMoveId}</h5>
-        <StartGame></StartGame>
+        <StartGame gameStatus={game.status}/>
+        {/* {game.status === 'ACTIVE' && (<StartGame/>)} */}
     </div>
   )
 
