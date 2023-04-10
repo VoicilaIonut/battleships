@@ -11,3 +11,53 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+* {
+  border: 1px solid red;
+}
+
+.square {
+  background: #fff;
+  border: 1px solid #999;
+  float: left;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 34px;
+  height: 34px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 34px;
+}
+
+.board-row:after {
+  clear: both;
+  content: '';
+  display: table;
+}
+
+
+.ship-row:after {
+  clear: both;
+  content: '';
+  display: table;
+}
+
+.vertical {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.ship-name {
+  margin: 5px;
+}
+
+.start-game {
+  display: flex;
+  font-size: small;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  align-items: center;
+}
