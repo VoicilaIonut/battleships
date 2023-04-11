@@ -4,350 +4,323 @@ import {
   useLoaderData,
   useNavigation,
 } from "react-router-dom";
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from "react";
+import JoinGameButton from "./JoinGameButton";
+import BoardPersonalActive from "./BoardPersonalActive";
+import SquareInactive from "./SquareInactive";
+import SquareActive from "./SquareActive";
+import BoardAdversar from "./BoardAdversar";
+import BoardActive from "./BoardActive";
+import {
+  AVAILABLE_SHIPS,
+  handleErrors,
+  boardLoadedWithMoves,
+  createEmptyBoard,
+  convertIndexesToApi,
+  convertIndexesFromApi,
+  shipConfigationForApi,
+  createBoardWithShip,
+  mutarePermisa,
+} from "./utils";
 // import { Routes } from "../../utils/routes-definition";
 
-
-const url = "https://react-labs.softbinator.com/game"
-
+const url = "https://react-labs.softbinator.com/game";
 
 export const loader = async ({ params }) => {
   const accessToken = localStorage["accessToken"];
   const res = await fetch(`${url}/${params.productId}`, {
     headers: { Authorization: `Bearer ${accessToken}` },
-  })
+  });
   if (res.status === 404) {
     throw new Response("Not Found", { status: 404 });
   }
-  
+
   return await res.json();
 };
 
 
-function Square({indexX, indexY, value, setPlaceOnGameTable}) {
-  return (
-    <>
-    <button className="square" onClick={() => setPlaceOnGameTable([indexX, indexY])}
-    > {value}</button>
-    </>
-  );
-}
-
-
-
-// function GenerateShip({ship}) {
-//   console.log(ship);
-//   return (
-//     <>
-//       <h5>Nume: {ship.name}</h5>
-//       <h5>Lungime: {ship.length}</h5>
-//       <h5>Folosita: {ship.placed ? "da" : "nu"}</h5>
-//       <h5>Orientare: {ship.vertical ? "vertical" : "orizontal"}</h5>
-//     </>
-//   )
-// }
-
-function Ship({ship, setSelected}) {
-  const [vertical, setVertical] = useState(false);
+function ShipActive({ ship, setSelected }) {
+  const [vertical, setVertical] = useState(ship.vertical);
 
   const handleSwitchButton = (e) => {
     e.preventDefault();
     ship.vertical = !vertical;
     setVertical(!vertical);
-  }
+  };
 
   const handleSelectButton = (e) => {
     e.preventDefault();
     console.log(ship.name);
     setSelected(ship.name);
-  }
+  };
 
   return (
     <>
       <h5>Nume: {ship.name}</h5>
       <h5>Lungime: {ship.length}</h5>
-      <h5>Folosita: {ship.placed ? "da" : "nu"}</h5>
+      {/* <h5>Folosita: {ship.placed ? "da" : "nu"}</h5> */}
       <h5>Orientare: {ship.vertical ? "vertical" : "orizontal"}</h5>
-      {/* <button onClick={handleSwitchButton}> Press to switch orientation</button> <br></br> */}
-      {!ship.placed && (
-        <>
-          <button onClick={handleSwitchButton}> Press to switch orientation</button>
-          <br></br>
-          <button onClick={handleSelectButton}> Press to place</button>
-        </>
-        )
-      }
+      <button onClick={handleSwitchButton}>Press to switch orientation</button>
+      <br></br>
+      <button onClick={handleSelectButton}> Press to place</button>
     </>
-  )
-
-
+  );
 }
 
-
-function ChooseShips({ships, setSelected}) {
-
-  return (
-    <div className="available ships">
-      {ships.map((ship) => !ship.placed && (<Ship ship={ship} setSelected={setSelected}/>))}
-    </div>
-  )
-}
-
-
-// const board = Array(10).fill(0).map(row => new Array(10).fill(0))
-const Game = ({board, setPlaceOnGameTable}) => {
-  const rowhtml = (row, indexX) => row.map((value, indexY) => <Square indexX={indexX} indexY={indexY} value={value}setPlaceOnGameTable={setPlaceOnGameTable}/>);
-  const boardhtml = board.map((row, indexX) => <div className='board-row'>{rowhtml(row, indexX)}</div>);
-  // console.log(boardhtml);
-  return (
-    <div className='game'>
-      {boardhtml}
-    </div>
-  )
-} 
-
-
-const AVAILABLE_SHIPS = [
-  {
-    name: 'carrier',
-    length: 6,
-    placed: null,
-    vertical: true,
-  },
-  {
-    name: 'battleship',
-    length: 4,
-    placed: null,
-    vertical: false,
-  },
-  {
-    name: 'battleship1',
-    length: 4,
-    placed: null,
-    vertical: false,
-  },
-  {
-    name: 'submarine',
-    length: 3,
-    placed: null,
-    vertical: false,
-  },
-  {
-    name: 'submarine1',
-    length: 3,
-    placed: null,
-    vertical: false,
-  },
-  {
-    name: 'submarine2',
-    length: 3,
-    placed: null,
-    vertical: false,
-  },
-  {
-    name: 'destroyer',
-    length: 2,
-    placed: null,
-    vertical: false,
-  },
-  {
-    name: 'destroyer1',
-    length: 2,
-    placed: null,
-    vertical: false,
-  },
-  {
-    name: 'destroyer2',
-    length: 2,
-    placed: null,
-    vertical: false,
-  },
-  {
-    name: 'destroyer3',
-    length: 2,
-    placed: null,
-    vertical: false,
-  },
-];
-
-
-
-const createBoardWithShip = (board, ship, indexX, indexY, value) => {
-  let copie = board.slice();
-  if (ship.vertical) {
-    for (let i = indexX; i < indexX + ship.length; i++) {
-      copie[i][indexY] = value;
-    }
-  } else {
-    for (let i = indexY; i < indexY + ship.length; i++) {
-      copie[indexX][i] = value;
-    }
-  }
-  console.log(copie);
-  return copie;
-}
-
-const checkOtherShips = (board, ship, indexX, indexY) => {
-  if (ship.vertical) {
-    for (let i = indexX; i < indexX + ship.length; i++) {
-      if (board[i][indexY] !== 0) {
-        return false;
-      }
-    }
-  } else {
-    for (let i = indexY; i < indexY + ship.length; i++) {
-      if (board[indexX][i] !== 0) {
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-const StartGame = ({gameStatus}) => {
-  const [selected, setSelected] = useState(null);
-  const [placeOnGameTable, setPlaceOnGameTable] = useState(null);
-  const [board, setBoard] = useState(Array(10).fill(0).map(row => new Array(10).fill(0)));
-  const [ships, setShip] = useState(AVAILABLE_SHIPS);
-  const [shipsPlaced, setShipsPlaced] = useState([]);
-  let { productId } = useParams();
-  console.log(selected, "hei from parent");
-  console.log(placeOnGameTable, 'hei from parent');
-
-  const mutarePermisa = ([indexX, indexY]) => {
-      const ship = ships.find(ship => ship.name === selected);
-      
-      if (!ship.vertical) {
-        console.log((indexY + ship.length) <= 9 && checkOtherShips(board, ship, indexX, indexY));
-        return (indexY + ship.length) <= 9 && checkOtherShips(board, ship, indexX, indexY);
-      } 
-      console.log((indexX + ship.length) <= 9 && checkOtherShips(board, ship, indexX, indexY))
-      return (indexX + ship.length) <= 9 && checkOtherShips(board, ship, indexX, indexY);
-  }
-
-  const handlePlaceShip = (e) => {
-    e.preventDefault();
-    console.log('PlaceShip', placeOnGameTable);
-    const ship = ships.find(ship => ship.name === selected);
-    const indexX = placeOnGameTable[0];
-    const indexY = placeOnGameTable[1];
-    ship.placed=true
-
-    const shipConfigation = {
-      "x": String.fromCharCode(65 + indexY),
-      "y": indexX + 1,
-      "size": ship.length,
-      "direction": (ship.vertical ? "VERTICAL" : "HORIZONTAL")
-    } 
-    console.log(shipConfigation);
-    setShipsPlaced([...shipsPlaced, shipConfigation]);
-    console.log(shipsPlaced, 'heeeeeeeeeeeeere');
-    setBoard(createBoardWithShip(board, ship, indexX, indexY, shipsPlaced.length + 1));
-    setSelected(null);
-  }
-
-  const handleSendMapToApi = (e) => {
-    e.preventDefault();
-    console.log(shipsPlaced, 'to api ----------------------------------------------------------------');
-    const accessToken = localStorage["accessToken"];
-    fetch(`${url}/${productId}`, {
-      method: "PATCH",
-      headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json",},
-      body: JSON.stringify({'ships':shipsPlaced})
-    }).then((response) => response.json())
-      .then((json) => console.log(json)); // 
-  }
-
-  const handleSendAttack = (e) => {
-    e.preventDefault();
-    console.log(placeOnGameTable, productId, "send attack to api");
-    const indexX = placeOnGameTable[0];
-    const indexY = placeOnGameTable[1];
-    const accessToken = localStorage["accessToken"];
-
-    const configureNewBoard =(result, indexX, indexY) => {
-      console.log(indexX, indexY, result);
-      const copie = board.slice();
-      copie[indexX][indexY] = result['result'] === true ? 'Y': "N";
-      setBoard(copie);
-    }
-
-    fetch(`${url}/strike/${productId}`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json",},
-      body: JSON.stringify({'x': String.fromCharCode(65 + indexY), 'y': indexX + 1})
-    }).then((response) => response.json())
-      .then((json) => configureNewBoard(json, indexX, indexY)); // 
-  }
-  console.log(gameStatus);
+function ListShips({ ships, setSelected }) {
   return (
     <>
-      <div className='start-game'>
-        <Game board={board} setPlaceOnGameTable={setPlaceOnGameTable}/>
-        {gameStatus==="MAP_CONFIG" && (
-          <>
-          <ChooseShips ships={ships} setSelected={setSelected}/><br></br>
-          <button onClick={handleSendMapToApi}>send to api</button> <br></br>
-          {selected && placeOnGameTable && mutarePermisa(placeOnGameTable) && (<button onClick={handlePlaceShip}>PUNE</button>)}
-          </>
-        )}
-        {gameStatus==="ACTIVE" && (
-            <>
-              <button onClick={handleSendAttack}>ATAC</button>
-            </>
+      <div className="available-ships">
+        {ships.map(
+          (ship) => !ship.placed && <ShipActive ship={ship} setSelected={setSelected} />
         )}
       </div>
     </>
-  )
+  );
 }
 
-const Product = () => {
+const ChooseShipsConfigurator = ({ ships, setShips}) => {
+  const [board, setBoard] = useState(createEmptyBoard());
+  const [selected, setSelected] = useState(null);
+  const [placeOnGameTable, setPlaceOnGameTable] = useState(null);
+  // let ships = AVAILABLE_SHIPS;
+
+  const handlePlaceShip = (e) => {
+    e.preventDefault();
+    console.log("PlaceShip", placeOnGameTable);
+    const shipsCopie = ships.slice();
+    const shipCopie = shipsCopie.find((ship) => ship.name === selected);
+    shipCopie.placed = true;
+    shipCopie.x = placeOnGameTable[0];
+    shipCopie.y = placeOnGameTable[1];
+    setShips(shipsCopie);
+    setBoard(
+      createBoardWithShip(board, shipCopie, shipsCopie.indexOf(shipCopie) + 1, placeOnGameTable)
+    );
+    setSelected(null);
+    console.log(ships);
+  };
+
+  const handleRestartConfigurator = (e) => {
+    e.preventDefault();
+    setBoard(createEmptyBoard());
+    setSelected(null);
+    setPlaceOnGameTable(null);
+    setShips(AVAILABLE_SHIPS);
+  };
+
+  return (
+    <div className="start-game">
+      <BoardActive board={board} setPlaceOnGameTable={setPlaceOnGameTable} />
+      {mutarePermisa(board, ships, selected, placeOnGameTable) && (
+          <button onClick={handlePlaceShip}>PUNE</button>
+        )}
+      <ListShips ships={ships} setSelected={setSelected} />
+      <button onClick={handleRestartConfigurator}>Restart</button>
+    </div>
+  );
+};
+
+const ChooseShipsMapConfig = () => {
+  const [ships, setShips] = useState(AVAILABLE_SHIPS);
+  const [message, setMessage] = useState(null);
   let { productId } = useParams();
+
+  const handleSendMapToApi = (e) => {
+    e.preventDefault();
+    let shipsPlaced = ships.filter(ship => ship.placed);
+    shipsPlaced = shipsPlaced.map(ship => shipConfigationForApi([ship.x, ship.y], ship.length, ship.vertical));
+    console.log(
+      shipsPlaced,
+      "to api ----------------------------------------------------------------"
+    );
+    const accessToken = localStorage["accessToken"];
+    fetch(`${url}/${productId}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ships: shipsPlaced }),
+    })
+      .then(handleErrors)
+      .then((response) => response.json())
+      .then((json) => console.log(json) || setMessage('Configurarea a fost efectuata cu succes!'))
+      .catch(
+        (error) =>
+          console.log(error) || setShips(AVAILABLE_SHIPS) || setMessage(error)
+      );
+  };
+
+  return (
+    <>
+      {message && <h5>{message}</h5>}
+      <ChooseShipsConfigurator
+        ships={ships}
+        setShips={setShips}
+      />
+      <button onClick={handleSendMapToApi}>send to api</button>
+    </>
+  );
+};
+
+// const BoardInactive = ({board}) => {
+//   const generateRow = (row) => row.map((value) => (<SquareInactive value={value}/>));
+//   const generate2DBoard = board.map((row) => <div className='board-row'>{generateRow(row)}</div>);
+//   return (
+//     <div className='game'>
+//       {generate2DBoard}
+//     </div>
+//   )
+// }
+
+// const BoardActive = ({board, setPlaceOnGameTable}) => {
+//   const generateRow = (row, indexX) => row.map((value, indexY) => <SquareActive indexX={indexX} indexY={indexY} value={value} setPlaceOnGameTable={setPlaceOnGameTable}/>);
+//   const generate2DBoard = board.map((row, indexX) => <div className='board-row'>{generateRow(row, indexX)}</div>);
+//   return (
+//     <div className='game'>
+//       {generate2DBoard}
+//     </div>
+//   )
+// }
+
+// const boardLoadedWithMoves = (board, moves) => {
+//   console.log("Board load games moves", moves);
+//   let copie = board.slice();
+//   for (const move of moves) {
+//     let [indexX, indexY] = convertIndexesFromApi(move.x, move.y)
+//     copie[indexX][indexY] = move.result ? 'Y' : 'N';
+//     console.log(indexX, indexY);
+//   }
+//   return copie;
+// }
+
+// const BoardAdversar = ({moves}) => {
+//   const [board, setBoard] = useState(Array(10).fill(0).map(row => new Array(10).fill(0)));
+
+//   useEffect(()=> {
+//     setBoard(boardLoadedWithMoves(board, moves));
+//   }, [])
+
+//   return (
+//     <div className='start-game'>
+//       <BoardInactive board={board}/>
+//       </div>
+//   )
+// }
+
+// async function handleErrors(response) {
+//   if (!response.ok) {
+//       const json = await response.json();
+//       throw json.message;
+//   }
+//   return response;
+// }
+
+// const BoardPersonalActive = ({moves}) => {
+//   const [board, setBoard] = useState(Array(10).fill(0).map(row => new Array(10).fill(0)));
+//   const [placeOnGameTable, setPlaceOnGameTable] = useState(null);
+//   const [errorMessage, setErrorMessage] = useState(null);
+//   let { productId } = useParams();
+
+//   useEffect(()=> {
+//     console.log('personal');
+//     setBoard(boardLoadedWithMoves(board, moves));
+//   }, [])
+
+//   const handleSendAttack = (e) => {
+//     e.preventDefault();
+//     console.log(placeOnGameTable, productId, "send attack to api");
+//     const accessToken = localStorage["accessToken"];
+
+//     fetch(`${url}/strike/${productId}`, {
+//       method: "POST",
+//       headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json",},
+//       body: JSON.stringify(convertIndexesToApi(placeOnGameTable))
+//     }).then(handleErrors)
+//       .then((response) => response.json())
+//       .then((json) => setBoard(boardLoadedWithMoves(board, [json])) || setErrorMessage(null) )
+//       .catch(error => console.log(error) || setPlaceOnGameTable(null) || setErrorMessage(error));
+
+//   }
+
+//   return (
+//     <>
+//       {errorMessage && (<h5 color="red">{errorMessage}</h5>)}
+//       <div className='start-game'>
+//         <BoardActive board={board} setPlaceOnGameTable={setPlaceOnGameTable}/>
+//         {placeOnGameTable !== null && (<button onClick={handleSendAttack}>ATAC</button>)}
+//       </div>
+//     </>
+//   )
+// }
+
+// const JoinGameButton = ({productId}) => {
+//   const handleJoinGame = (e) => {
+//     e.preventDefault();
+//     const accessToken = localStorage["accessToken"];
+//     fetch(`${url}/join/${productId}`, {
+//       method: "POST",
+//       headers: { Authorization: `Bearer ${accessToken}` },
+//       body: JSON.stringify({id: productId})
+//     }).then((response) => response.json())
+//       .then((json) => console.log(json)); // redirect to game
+//   }
+//   return (
+//     <button onClick={handleJoinGame}> Join the game </button>
+//   )
+// }
+
+const Product = () => {
   // const params = useParams();
   // const navigate = useNavigate();
-  const data = useLoaderData();
+  const gameState = useLoaderData();
   const navigationState = useNavigation();
+  let { productId } = useParams();
 
   if (navigationState.state === "loading") {
     return <h1 className="title">Loading....</h1>;
   }
 
-  const createDataHtml = (game) => (
+  const createGameDetails = (game) => (
     <div className="game">
-        <h1>Id joc: {game.id}</h1>
-        <h5>Status {game.status}</h5>
-        <h5>Player 1 {game.player1Id}</h5>
-        <h5>Player 2 {game.player2Id}</h5>
-        <h5>Play care trebuie sa atace: {game.playerToMoveId}</h5>
-        <StartGame gameStatus={game.status}/>
-        {/* {game.status === 'ACTIVE' && (<StartGame/>)} */}
-    </div>
-  )
+      <h1>Id joc: {game.id}</h1>
+      <h5>Status {game.status}</h5>
+      <h5>Player 1 {game.player1Id}</h5>
+      <h5>Player 2 {game.player2Id}</h5>
+      <h5>Play care trebuie sa atace: {game.playerToMoveId}</h5>
+      {gameState.status === "CREATED" &&
+        gameState.player1Id !== localStorage.getItem("id") && (
+          <JoinGameButton productId={productId} />
+        )}
+      {gameState.status === "MAP_CONFIG" && <ChooseShipsMapConfig />}
 
-  const handleJoinGame = (e) => {
-    e.preventDefault();
-    const accessToken = localStorage["accessToken"];
-    fetch(`${url}/join/${productId}`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${accessToken}` },
-      body: JSON.stringify({id: productId})
-    }).then((response) => response.json())
-      .then((json) => console.log(json)); // redirect to game
-  }
-  console.log(data, "product");
+      {game.status === "ACTIVE" && (
+        <>
+          <BoardPersonalActive
+            moves={game.moves.filter(
+              (move) => move.playerId === localStorage.getItem("id")
+            )}
+          />
+          <BoardAdversar
+            moves={game.moves.filter(
+              (move) => move.playerId !== localStorage.getItem("id")
+            )}
+          />
+        </>
+      )}
+    </div>
+  );
+
   return (
     <>
-      <h1>works</h1>
-      <button onClick={handleJoinGame}> Join the game </button>
-      <div>
-        {createDataHtml(data)}
-      </div>
+      <div>{createGameDetails(gameState)}</div>
     </>
     // <div style={{ border: "1px solid grey" }}>
     //   <h2 className="title" style={{ marginTop: 0 }}>
     //     Product wtkfk? {params.productId}
     //   </h2>
-      
+
     //   <button
     //     onClick={() => navigate(Routes.ProductsRoute)}
     //     style={{ display: "block", marginTop: "70px" }}

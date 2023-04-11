@@ -61,3 +61,11 @@ code {
   flex-wrap: wrap;
   align-items: center;
 }
+
+.available-ships > h5 {
+  margin: 2px;
+}
+
+.available-ships > button {
+  font-size: 15px;
+}
