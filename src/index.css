@@ -13,7 +13,7 @@ code {
 }
 
 * {
-  border: 1px solid red;
+  border: 1px solid green;
 }
 
 .square {
@@ -68,4 +68,17 @@ code {
 
 .available-ships > button {
   font-size: 15px;
+}
+
+.gotobutton {
+  border-radius: 10%;
+  background-color: lightblue;
+}
+
+.Y {
+  background-color: greenyellow;
+}
+
+.N {
+  background-color: red;
 }

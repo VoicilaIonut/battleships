@@ -6,7 +6,7 @@ export const Product = ({ product, id }) => {
   const navigate = useNavigate();
   return (
     <div
-      onClick={() => navigate(`${Routes.ProductsRoute}/${id}`)}
+      onClick={() => navigate(`${Routes.GamesRoute}/${id}`)}
       style={{
         height: "100px",
         width: "100px",

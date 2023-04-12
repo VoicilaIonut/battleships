@@ -6,15 +6,14 @@ import {
 import ErrorPage from "./pages/ErrorPage";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import Products from "./pages/Products";
-import Product from "./pages/Product";
+import Games from "./pages/Games";
+import Game from "./pages/Game";
 import NotFound from "./pages/NotFound";
-import OnProductRoot from "./pages/Products/OnProductRoot";
 import AppLayout from "./layout/app-layout";
 import { AuthLayout } from "./layout/auth-layout/auth-layout";
 import ProtectedRoute from "./utils/protected-route";
-import Settings from "./pages/Settings";
-import { loader } from "./pages/Product/Product";
+import Profile from "./pages/Profile";
+import { loaderGame } from "./pages/Game/Game";
 import { Routes } from "./utils/routes-definition";
 import React from "react";
 
@@ -22,9 +21,9 @@ const {
   DashboardRoute,
   LoginRoute,
   RegisterRoute,
-  SettingsRoute,
-  ProductsRoute,
-  ProductRoute,
+  ProfileRoute,
+  GamesRoute,
+  GameRoute,
 } = Routes;
 
 export const router = createBrowserRouter(
@@ -42,14 +41,15 @@ export const router = createBrowserRouter(
           <Route path={DashboardRoute} element={<Dashboard />} />
         </Route>
         <Route element={<ProtectedRoute />}>
-          <Route path={ProductsRoute} element={<Products />}/>
+          <Route path={GamesRoute} element={<Games />} />
           <Route
             errorElement={<p>Error element from product id</p>}
-            path={ProductRoute}
-            element={<Product />}
-            loader={loader}/>
+            path={GameRoute}
+            element={<Game />}
+            loader={loaderGame}
+          />
         </Route>
-        <Route path={SettingsRoute} element={<Settings />} />
+        <Route path={ProfileRoute} element={<Profile />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Route>

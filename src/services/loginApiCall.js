@@ -9,11 +9,11 @@ export default async function login(obj) {
         "Content-Type": "application/json",
       },
     });
-    let json = await response.json();
-    console.log(json);
-
-    localStorage.setItem("accessToken", json["accessToken"]);
-    localStorage.setItem("refreshToken", json["refreshToken"]);
+    if (response.status === 200) {
+      let json = await response.json();
+      localStorage.setItem("accessToken", json["accessToken"]);
+      localStorage.setItem("refreshToken", json["refreshToken"]);
+    }
     return response;
   } catch (e) {
     console.log(e);

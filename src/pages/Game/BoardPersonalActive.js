@@ -1,25 +1,26 @@
 import React, { useEffect, useState } from "react";
-import {handleErrors, boardLoadedWithMoves, convertIndexesToApi, convertIndexesFromApi} from './utils';
+import {
+  handleErrors,
+  boardLoadedWithMoves,
+  convertIndexesToApi,
+  createEmptyBoard,
+} from "./utils";
 import BoardActive from "./BoardActive";
 
 import { useParams } from "react-router-dom";
-const url = "https://react-labs.softbinator.com/game"
-
+const url = "https://react-labs.softbinator.com/game";
 
 const BoardPersonalActive = ({ moves }) => {
   const [board, setBoard] = useState(
-    Array(10)
-      .fill(0)
-      .map((row) => new Array(10).fill(0))
+    boardLoadedWithMoves(createEmptyBoard(), moves)
   );
   const [placeOnGameTable, setPlaceOnGameTable] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   let { productId } = useParams();
 
   useEffect(() => {
-    console.log("personal");
-    setBoard(boardLoadedWithMoves(board, moves));
-  }, []);
+    setErrorMessage(null);
+  }, [moves]);
 
   const handleSendAttack = (e) => {
     e.preventDefault();
@@ -40,12 +41,8 @@ const BoardPersonalActive = ({ moves }) => {
         (json) =>
           setBoard(boardLoadedWithMoves(board, [json])) || setErrorMessage(null)
       )
-      .catch(
-        (error) =>
-          console.log(error) ||
-          setPlaceOnGameTable(null) ||
-          setErrorMessage(error)
-      );
+      .catch((error) => console.log(error) || setErrorMessage(error));
+    setPlaceOnGameTable(null);
   };
 
   return (

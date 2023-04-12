@@ -8,14 +8,15 @@ export const Navigation = () => {
   const navigate = useNavigate();
 
   const handleSignOut =() => {
-    localStorage.setItem("accessToken","");
+    localStorage.setItem("accessToken", "");
     localStorage.setItem("refreshToken","")
+    localStorage.setItem("id","")
     navigate(Routes.LoginRoute, { replace: true });
   }
 
   return (
     <nav>
-      <h1 onClick={() => navigate(Routes.DashboardRoute)}>LOGO</h1>
+      <h1 onClick={() => navigate(Routes.DashboardRoute)}>Battleships</h1>
       <div className="actions-wrapper">
         <NavLink
           className={({ isActive }) => `link ${isActive ? "active" : ""}`}
@@ -23,11 +24,11 @@ export const Navigation = () => {
         >
           Home
         </NavLink>
-        <NavLink className="link" to={Routes.ProductsRoute}>
-          Products
+        <NavLink className="link" to={Routes.GamesRoute}>
+        Games
         </NavLink>
-        <NavLink className="link" to={Routes.SettingsRoute}>
-          Settings
+        <NavLink className="link" to={Routes.ProfileRoute}>
+        Profile
         </NavLink>
         <button
           onClick={handleSignOut}

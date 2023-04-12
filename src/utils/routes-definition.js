@@ -2,7 +2,7 @@ export const Routes = {
     DashboardRoute: "/",
     LoginRoute: "/login",
     RegisterRoute: "/register",
-    ProductsRoute: "/products",
-    ProductRoute: "/products/:productId",
-    SettingsRoute: "/settings",
+    GamesRoute: "/games",
+    GameRoute: "/games/:productId",
+    ProfileRoute: "/profile",
   };

@@ -1,5 +1,3 @@
-import React from "react";
-
 async function handleErrors(response) {
   if (!response.ok) {
     const json = await response.json();
@@ -8,13 +6,23 @@ async function handleErrors(response) {
   return response;
 }
 
+const boardLoadedWithShips = (shipsCoord) => {
+  let board = createEmptyBoard();
+  for (const ship of shipsCoord) {
+    let [indexX, indexY] = convertIndexesFromApi(ship.x, ship.y);
+    board[indexX][indexY] = ship.hit ? "Y" : "N";
+  }
+  return board;
+};
+
 const boardLoadedWithMoves = (board, moves) => {
-  console.log("Board load games moves", moves);
+  // console.log("Board load games moves", moves);
   let copie = board.slice();
   for (const move of moves) {
-    let [indexX, indexY] = convertIndexesFromApi(move.x, move.y);
-    copie[indexX][indexY] = move.result ? "Y" : "N";
-    console.log(indexX, indexY);
+    const [indexX, indexY] = convertIndexesFromApi(move.x, move.y);
+    if (copie[indexX][indexY] !== "Y")
+      copie[indexX][indexY] = move.result ? "Y" : "N";
+    // console.log(indexX, indexY);
   }
   return copie;
 };
@@ -42,22 +50,22 @@ const createEmptyBoard = () =>
     .fill(0)
     .map((row) => new Array(10).fill(0));
 
-
 // check also is selected and placeOnGameTable is a valid input (aka not null)
 const mutarePermisa = (board, ships, selected, placeOnGameTable) => {
-    if (selected === null) {
-        return false;
-    }
-    if (!placeOnGameTable) {
-        return false;
-    }        
-    const indexX = placeOnGameTable[0], indexY = placeOnGameTable[1];
-    const ship = ships.find((ship) => ship.name === selected);
+  if (selected === null) {
+    return false;
+  }
+  if (!placeOnGameTable) {
+    return false;
+  }
+  const indexX = placeOnGameTable[0],
+    indexY = placeOnGameTable[1];
+  const ship = ships.find((ship) => ship.name === selected);
 
   if (!ship.vertical) {
-    console.log(
-      indexY + ship.length <= 9 && checkOtherShips(board, ship, indexX, indexY)
-    );
+    // console.log(
+    //   indexY + ship.length <= 9 && checkOtherShips(board, ship, indexX, indexY)
+    // );
     return (
       indexY + ship.length <= 9 && checkOtherShips(board, ship, indexX, indexY)
     );
@@ -68,37 +76,44 @@ const mutarePermisa = (board, ships, selected, placeOnGameTable) => {
 };
 
 const createBoardWithShip = (board, ship, value, [indexX, indexY]) => {
-    let copie = board.slice();
-    if (ship.vertical) {
-      for (let i = indexX; i < indexX + ship.length; i++) {
-        copie[i][indexY] = value;
-      }
-    } else {
-      for (let i = indexY; i < indexY + ship.length; i++) {
-        copie[indexX][i] = value;
-      }
+  let copie = board.slice();
+  if (ship.vertical) {
+    for (let i = indexX; i < indexX + ship.length; i++) {
+      copie[i][indexY] = value;
     }
-    console.log(copie);
-    return copie;
-  };
-  
-  const checkOtherShips = (board, ship, indexX, indexY) => {
-    if (ship.vertical) {
-      for (let i = indexX; i < indexX + ship.length; i++) {
-        if (board[i][indexY] !== 0) {
-          return false;
-        }
-      }
-    } else {
-      for (let i = indexY; i < indexY + ship.length; i++) {
-        if (board[indexX][i] !== 0) {
-          return false;
-        }
-      }
+  } else {
+    for (let i = indexY; i < indexY + ship.length; i++) {
+      copie[indexX][i] = value;
     }
-    return true;
-  };
+  }
+  // console.log(copie);
+  return copie;
+};
 
+const checkOtherShips = (board, ship, indexX, indexY) => {
+  if (ship.vertical) {
+    for (let i = indexX; i < indexX + ship.length; i++) {
+      if (board[i][indexY] !== 0) {
+        return false;
+      }
+    }
+  } else {
+    for (let i = indexY; i < indexY + ship.length; i++) {
+      if (board[indexX][i] !== 0) {
+        return false;
+      }
+    }
+  }
+  return true;
+};
+
+const checkWinnerWithMoves = (moves, needed) => {
+  let uniqueValues = new Set();
+  for (const move of moves) {
+    uniqueValues.add([move.x, move.y]);
+  }
+  return uniqueValues.length === needed;
+};
 
 const AVAILABLE_SHIPS = [
   {
@@ -106,87 +121,88 @@ const AVAILABLE_SHIPS = [
     length: 6,
     placed: null,
     vertical: true,
-    x:null,
-    y:null,
+    x: null,
+    y: null,
   },
   {
     name: "battleship",
     length: 4,
     placed: null,
     vertical: false,
-    x:null,
-    y:null,
+    x: null,
+    y: null,
   },
   {
     name: "battleship1",
     length: 4,
     placed: null,
     vertical: false,
-    x:null,
-    y:null,
+    x: null,
+    y: null,
   },
   {
     name: "submarine",
     length: 3,
     placed: null,
     vertical: false,
-    x:null,
-    y:null,
-},
+    x: null,
+    y: null,
+  },
   {
     name: "submarine1",
     length: 3,
     placed: null,
     vertical: false,
-    x:null,
-    y:null,
+    x: null,
+    y: null,
   },
   {
     name: "submarine2",
     length: 3,
     placed: null,
     vertical: false,
-    x:null,
-    y:null,
+    x: null,
+    y: null,
   },
   {
     name: "destroyer",
     length: 2,
     placed: null,
     vertical: false,
-    x:null,
-    y:null,
+    x: null,
+    y: null,
   },
   {
     name: "destroyer1",
     length: 2,
     placed: null,
     vertical: false,
-    x:null,
-    y:null,
+    x: null,
+    y: null,
   },
   {
     name: "destroyer2",
     length: 2,
     placed: null,
     vertical: false,
-    x:null,
-    y:null,
+    x: null,
+    y: null,
   },
   {
     name: "destroyer3",
     length: 2,
     placed: null,
     vertical: false,
-    x:null,
-    y:null,
+    x: null,
+    y: null,
   },
-]
+];
 
 export {
   AVAILABLE_SHIPS,
+  checkWinnerWithMoves,
   createEmptyBoard,
-  checkOtherShips, 
+  checkOtherShips,
   mutarePermisa,
   createBoardWithShip,
   shipConfigationForApi,
@@ -194,4 +210,5 @@ export {
   boardLoadedWithMoves,
   convertIndexesFromApi,
   convertIndexesToApi,
+  boardLoadedWithShips,
 };
