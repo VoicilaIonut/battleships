@@ -14,7 +14,7 @@ const BoardActive = ({ board, setPlaceOnGameTable }) => {
   const generate2DBoard = board.map((row, indexX) => (
     <div className="board-row indexX">{generateRow(row, indexX)}</div>
   ));
-  return <div className="gameActive">{generate2DBoard}</div>;
+  return <div className="board">{generate2DBoard}</div>;
 };
 
 export default BoardActive;
