@@ -10,7 +10,7 @@ const boardLoadedWithShips = (shipsCoord) => {
   let board = createEmptyBoard();
   for (const ship of shipsCoord) {
     let [indexX, indexY] = convertIndexesFromApi(ship.x, ship.y);
-    board[indexX][indexY] = ship.hit ? "Y" : "N";
+    board[indexX][indexY] = ship.hit ? "Y" : "NShip";
   }
   return board;
 };

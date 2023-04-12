@@ -5,7 +5,7 @@ const BoardInactive = ({board}) => {
   const generateRow = (row) => row.map((value) => (<SquareInactive value={value}/>));
   const generate2DBoard = board.map((row) => <div className='board-row'>{generateRow(row)}</div>);
   return (
-    <div className='game'>
+    <div className='board'>
       {generate2DBoard}
     </div>
   )

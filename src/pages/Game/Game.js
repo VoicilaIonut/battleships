@@ -58,7 +58,7 @@ const Game = () => {
   );
 
   return (
-    <div className="game">
+    <div className="gameContainer">
       <h1>Id joc: {gameState.id}</h1>
       <h5>Status {gameState.status}</h5>
       <h5>Player 1 {gameState.player1Id}</h5>

@@ -48,9 +48,9 @@ const Games = () => {
       {errorMessage && <h1>{errorMessage}</h1>}
       <CreateGameButton navigate={navigate} setErrorMessage={setErrorMessage} />
       <h1 className="title"> Games</h1>
-      <div style={{ display: "flex", flexDirection: "column", margin:"10px"}}>
+      <div className="gamesContainer">
         {games.map((game) => (
-          <div className={game.id}>
+          <div className={"gameContainer " + game.id}>
             <h5 className="id">Joc ID: {game.id}</h5>
             <h5 className="status">Status joc: {game.status}</h5>
             <h5 className="player1 email"> Player 1 email: {game.player1.email}</h5>

@@ -12,9 +12,9 @@ code {
     monospace;
 }
 
-* {
+/* * {
   border: 1px solid green;
-}
+} */
 
 .square {
   background: #fff;
@@ -71,7 +71,7 @@ code {
 }
 
 .gotobutton {
-  border-radius: 10%;
+  /* border-radius: 10%; */
   background-color: lightblue;
 }
 
@@ -81,4 +81,30 @@ code {
 
 .N {
   background-color: red;
+}
+
+.NShip {
+  background-color: blue;
+}
+
+.gamesContainer {
+  display: "flex";
+  flex-direction: "column";
+  border: 1px solid black;
+}
+
+.gameContainer {
+  display: flex;
+  flex-direction: column;
+  margin: 25px;
+  margin-left: 25%;
+  margin-right: 25%;
+  border: 1px solid black;
+}
+
+.start-game {
+  padding: 5%;
+  display: flex;
+  flex-direction: column;
+  /* background-color: lig; */
 }
